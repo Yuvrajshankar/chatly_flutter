@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:chatly_flutter/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -19,6 +20,7 @@ class _RegisterState extends State<Register> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   Uint8List? _image;
+  final AuthServices authServices = AuthServices();
 
   @override
   void dispose() {
@@ -35,7 +37,19 @@ class _RegisterState extends State<Register> {
     });
   }
 
-  void signupUser() {}
+  void signupUser() {
+    if (_image != null) {
+      authServices.signUpUser(
+        context: context,
+        profileImage: _image!,
+        userName: usernameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+    } else {
+      showSnackBar(context, 'Please select a profile image');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

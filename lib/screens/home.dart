@@ -1,6 +1,7 @@
 import 'package:chatly_flutter/provider/theme_provider.dart';
 import 'package:chatly_flutter/screens/manage_friends.dart';
 import 'package:chatly_flutter/screens/profile.dart';
+import 'package:chatly_flutter/services/auth_services.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatly_flutter/components/friends.dart';
@@ -16,8 +17,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  void signOutUser(BuildContext context){
-
+  void signOutUser(BuildContext context) {
+    AuthServices().signOut(context);
   }
 
   final List<Map<String, String>> friends = [
@@ -105,7 +106,8 @@ class _HomeState extends State<Home> {
                 ),
                 currentAccountPictureSize: const Size.square(40),
                 currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStRPupL6Q12lc_6nyw8GhGH2gN4l1qtA5nZA&s"),
+                  backgroundImage: NetworkImage(
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStRPupL6Q12lc_6nyw8GhGH2gN4l1qtA5nZA&s"),
                   radius: 18,
                 ),
                 accountName: Text(

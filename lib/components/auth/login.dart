@@ -1,3 +1,4 @@
+import 'package:chatly_flutter/services/auth_services.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chatly_flutter/widgets/my_button.dart';
@@ -10,8 +11,15 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
+    final AuthServices authServices = AuthServices();
 
-    void loginUser() {}
+    void loginUser() {
+      authServices.signInUser(
+        context: context,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+    }
 
     return Column(
       children: [

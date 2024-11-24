@@ -1,3 +1,4 @@
+import 'package:chatly_flutter/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,13 +27,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final AuthServices authServices = AuthServices();
+
+  @override
+  void initState() {
+    super.initState();
+    authServices.getUserData(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Chatly.',
       theme: Provider.of<ThemeProvider>(context).themeData,
-      // home: const Home(),
       home: Provider.of<UserProvider>(context).user.token.isEmpty
           ? const Auth()
           : const Home(),
