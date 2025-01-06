@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/login", login);
 router.patch("/update", verifyToken, update);
-router.get("/already", verifyToken, authCheck);
+router.post("/already", verifyToken, authCheck);
 router.get("/user", verifyToken, getUserDetails);
 router.get("/friends", verifyToken, getAllFriends);
 router.patch("/:friendId", verifyToken, addRemoveFriend);

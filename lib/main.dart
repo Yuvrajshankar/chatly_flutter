@@ -28,7 +28,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final AuthServices authServices = AuthServices();
-  bool isLoading = true;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      isLoading = true;
+    });
+
+    authServices.getUserData(context);
+
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,15 +51,19 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Chatly',
       theme: Provider.of<ThemeProvider>(context).themeData,
-      // home: isLoading
-      //     ? const Center(child: CircularProgressIndicator())
-      //     : Provider.of<UserProvider>(context).user.token.isEmpty
-      //         ? const Auth()
-      //         : const Home(),
+      home: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
+            )
+          : Provider.of<UserProvider>(context).user.token.isEmpty
+              ? const Auth()
+              : const Home(),
       // home: Provider.of<UserProvider>(context).user.token.isEmpty
       //     ? const Auth()
       //     : const Home(),
-      home: Home(),
+      // home: Home(),
     );
   }
 }

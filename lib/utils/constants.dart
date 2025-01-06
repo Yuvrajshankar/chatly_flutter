@@ -1,3 +1,4 @@
 class Constants {
-  static String uri = 'http://localhost:5846';
+  static String uri =
+      'https://chatly-flutter-backend-with-socket-io.onrender.com';
 }

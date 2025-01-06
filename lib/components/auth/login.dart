@@ -16,6 +16,22 @@ class _LoginState extends State<Login> {
   bool isLoading = false;
   final AuthServices authServices = AuthServices();
 
+  void loginUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await authServices.logInUser(
+      context: context,
+      email: emailController.text,
+      password: passwordController.text,
+    );
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -31,7 +47,7 @@ class _LoginState extends State<Login> {
           obscureText: true,
         ),
         MyButton(
-          onTap: () {},
+          onTap: loginUser,
           content: isLoading
               ? const CircularProgressIndicator()
               : const Text(

@@ -1,5 +1,6 @@
 import 'package:chatly_flutter/components/friends.dart';
 import 'package:chatly_flutter/provider/theme_provider.dart';
+import 'package:chatly_flutter/provider/user_provider.dart';
 import 'package:chatly_flutter/screens/add_friend.dart';
 import 'package:chatly_flutter/screens/chat.dart';
 import 'package:chatly_flutter/screens/manage_friends.dart';
@@ -39,6 +40,10 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).user;
+
+    debugPrint("Home token: ${user.token}");
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
