@@ -1,10 +1,12 @@
 import 'dart:typed_data';
 
+import 'package:chatly_flutter/provider/user_provider.dart';
 import 'package:chatly_flutter/utils/utils.dart';
 import 'package:chatly_flutter/widgets/my_button.dart';
 import 'package:chatly_flutter/widgets/my_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -35,6 +37,8 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context, listen: false).user;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
@@ -60,8 +64,7 @@ class _ProfileState extends State<Profile> {
                       )
                     : CircleAvatar(
                         radius: 64,
-                        backgroundImage: NetworkImage(
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStRPupL6Q12lc_6nyw8GhGH2gN4l1qtA5nZA&s"),
+                        backgroundImage: NetworkImage(user.profileImage),
                         backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                 Positioned(
@@ -77,12 +80,12 @@ class _ProfileState extends State<Profile> {
             const SizedBox(height: 8),
             MyTextField(
               controller: usernameController,
-              hintText: "kitty",
+              hintText: user.userName,
               obscureText: false,
             ),
             MyTextField(
               controller: emailController,
-              hintText: "kitty@gmail.com",
+              hintText: user.email,
               obscureText: false,
             ),
             MyButton(

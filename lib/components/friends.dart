@@ -51,7 +51,7 @@ class Friends extends StatelessWidget {
                 ),
               ),
               subtitle: Text(
-                friend['subtitle']!,
+                "Say 👋🏻 hi to ${friend['name']!}",
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primaryContainer,
                 ),

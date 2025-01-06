@@ -1,15 +1,23 @@
+import 'package:chatly_flutter/services/friend_services.dart';
 import 'package:flutter/material.dart';
 
 class RemoveFriend extends StatelessWidget {
   final String friendName;
+  final String friendId;
 
   const RemoveFriend({
     super.key,
     required this.friendName,
+    required this.friendId,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Remove Friend
+    void removeFriend() {
+      FriendServices().addRemoveFriend(context, friendId);
+    }
+
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -28,7 +36,7 @@ class RemoveFriend extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: removeFriend,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                 ),

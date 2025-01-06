@@ -1,10 +1,13 @@
 import 'package:chatly_flutter/components/friends.dart';
+import 'package:chatly_flutter/provider/friend_provider.dart';
 import 'package:chatly_flutter/provider/theme_provider.dart';
 import 'package:chatly_flutter/provider/user_provider.dart';
 import 'package:chatly_flutter/screens/add_friend.dart';
 import 'package:chatly_flutter/screens/chat.dart';
 import 'package:chatly_flutter/screens/manage_friends.dart';
 import 'package:chatly_flutter/screens/profile.dart';
+import 'package:chatly_flutter/services/auth_services.dart';
+import 'package:chatly_flutter/services/friend_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,33 +19,36 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Map<String, String>> friends = [
-    {
-      "name": "John Doe",
-      "email": "jondoe@gmail.com",
-      "subtitle": "Last online 5 min ago",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-    },
-    {
-      "name": "Jane Smith",
-      "email": "jondoe@gmail.com",
-      "subtitle": "Last online 2 hours ago",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-    },
-    {
-      "name": "Alice Johnson",
-      "email": "jondoe@gmail.com",
-      "subtitle": "Last online yesterday",
-      "image":
-          "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context).user;
+    // getting friends
+    final FriendServices friendServices = FriendServices();
+    // bool isLoading = false;
 
-    debugPrint("Home token: ${user.token}");
+    friendServices.getFriends(context);
+
+    // accessing providers
+    final user = Provider.of<UserProvider>(context).user;
+    var friends = Provider.of<FriendProvider>(context).friendsList;
+
+    // debugPrint("Home token: ${user.token}");
+    // debugPrint("Friends: ${friends.length}");
+
+    // Convert List<Friends> to List<Map<String, String>>
+    final friendsData = friends.map((friend) {
+      return {
+        'name': friend.userName,
+        'email': friend.email,
+        'image': friend.profileImage,
+      };
+    }).toList();
+
+    // debugPrint("friendsData: $friendsData");
+
+    // Log Out
+    void signOutUser(BuildContext context) {
+      AuthServices().signOut(context);
+    }
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -73,26 +79,30 @@ class _HomeState extends State<Home> {
           color: Theme.of(context).colorScheme.secondary,
         ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Friends(
-              friends: friends,
-              onFriendSelected: (friend) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Chat(
-                      name: friend['name']!,
-                      image: friend['image']!,
-                    ),
+      body: friends.isEmpty
+          ? Center(
+              child: Text("No friends. Make some!"),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: Friends(
+                    friends: friendsData,
+                    onFriendSelected: (friend) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Chat(
+                            name: friend['name']!,
+                            image: friend['image']!,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       drawer: Drawer(
         child: Column(
           children: [
@@ -105,19 +115,18 @@ class _HomeState extends State<Home> {
                 ),
                 currentAccountPictureSize: const Size.square(40),
                 currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStRPupL6Q12lc_6nyw8GhGH2gN4l1qtA5nZA&s"),
+                  backgroundImage: NetworkImage(user.profileImage),
                   radius: 18,
                 ),
                 accountName: Text(
-                  "kitty",
+                  user.userName,
                   style: TextStyle(
                     fontSize: 18,
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
                 accountEmail: Text(
-                  "kitty@gmail.com",
+                  user.email,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.secondary,
                   ),
@@ -198,7 +207,7 @@ class _HomeState extends State<Home> {
                   color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
-              onTap: () {},
+              onTap: () => signOutUser(context),
             ),
           ],
         ),

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 class SearchFriend extends StatelessWidget {
+  final Function(String)? onChanged;
   final Function()? onTap;
   final bool? enable;
-
   const SearchFriend({
     super.key,
     this.onTap,
+    this.onChanged,
     this.enable = true,
   });
 
@@ -18,7 +19,7 @@ class SearchFriend extends StatelessWidget {
         onTap: onTap,
         child: TextField(
           decoration: InputDecoration(
-            hintText: 'Add friend by search...',
+            hintText: 'Add friend by searching username',
             hintStyle: TextStyle(
               color: Theme.of(context).colorScheme.secondary,
             ),
@@ -31,9 +32,7 @@ class SearchFriend extends StatelessWidget {
             filled: true,
             fillColor: Theme.of(context).colorScheme.primary,
           ),
-          onChanged: (value) {
-            debugPrint('Search query: $value');
-          },
+          onChanged: onChanged,
           enabled: enable,
         ),
       ),

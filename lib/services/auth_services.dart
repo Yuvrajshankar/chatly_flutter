@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:chatly_flutter/provider/user_provider.dart';
+import 'package:chatly_flutter/screens/auth.dart';
 import 'package:chatly_flutter/screens/home.dart';
 import 'package:chatly_flutter/utils/constants.dart';
 import 'package:chatly_flutter/utils/utils.dart';
@@ -49,9 +50,9 @@ class AuthServices {
           );
         },
       );
-      debugPrint("userProvider: ${userProvider.user.email}");
+      // debugPrint("userProvider: ${userProvider.user.email}");
     } catch (e) {
-      debugPrint(e.toString());
+      // debugPrint(e.toString());
       showSnackBar(context, e.toString());
     }
   }
@@ -61,7 +62,7 @@ class AuthServices {
     BuildContext context,
   ) async {
     try {
-      debugPrint("Get User Data Function Working Start");
+      // debugPrint("Get User Data Function Working Start");
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('x-auth-token');
@@ -70,9 +71,9 @@ class AuthServices {
         prefs.setString('x-auth-token', '');
       }
 
-      debugPrint("token: $token");
+      // debugPrint("token: $token");
 
-      var tokenRes = await http.get(
+      var tokenRes = await http.post(
         Uri.parse('${Constants.uri}/auth/already'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -80,7 +81,7 @@ class AuthServices {
         },
       );
 
-      debugPrint("tokenRes: ${tokenRes.body}");
+      // debugPrint("tokenRes: ${tokenRes.body}");
 
       var response = jsonDecode(tokenRes.body);
 
@@ -93,11 +94,11 @@ class AuthServices {
           },
         );
 
-        debugPrint("response: $response");
-        debugPrint("userRes: ${userRes.body}");
+        // debugPrint("response: $response");
+        // debugPrint("userRes: ${userRes.body}");
 
         userProvider.setUser(userRes.body);
-        debugPrint("userProvider: ${userProvider.user.token}");
+        // debugPrint("userProvider: ${userProvider.user.token}");
       }
     } catch (e) {
       showSnackBar(
@@ -110,4 +111,15 @@ class AuthServices {
   // update
 
   // logout
+  void signOut(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('x-auth-token', '');
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const Auth(),
+      ),
+      (route) => false,
+    );
+  }
 }

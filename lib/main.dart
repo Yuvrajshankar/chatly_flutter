@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:chatly_flutter/provider/friend_provider.dart';
 import 'package:chatly_flutter/provider/theme_provider.dart';
 import 'package:chatly_flutter/provider/user_provider.dart';
 import 'package:chatly_flutter/screens/auth.dart';
 import 'package:chatly_flutter/screens/home.dart';
 import 'package:chatly_flutter/services/auth_services.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +15,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => FriendProvider()),
       ],
       child: const MyApp(),
     ),
@@ -33,12 +36,19 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _initializeUserData();
+  }
 
+  Future<void> _initializeUserData() async {
     setState(() {
       isLoading = true;
     });
 
-    authServices.getUserData(context);
+    try {
+      await authServices.getUserData(context);
+    } catch (e) {
+      debugPrint("Error initializing user data: $e");
+    }
 
     setState(() {
       isLoading = false;
@@ -54,16 +64,12 @@ class _MyAppState extends State<MyApp> {
       home: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: Colors.blueAccent,
               ),
             )
           : Provider.of<UserProvider>(context).user.token.isEmpty
               ? const Auth()
               : const Home(),
-      // home: Provider.of<UserProvider>(context).user.token.isEmpty
-      //     ? const Auth()
-      //     : const Home(),
-      // home: Home(),
     );
   }
 }
