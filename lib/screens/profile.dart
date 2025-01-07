@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:chatly_flutter/provider/user_provider.dart';
+import 'package:chatly_flutter/services/auth_services.dart';
 import 'package:chatly_flutter/utils/utils.dart';
 import 'package:chatly_flutter/widgets/my_button.dart';
 import 'package:chatly_flutter/widgets/my_text_field.dart';
@@ -32,6 +33,34 @@ class _ProfileState extends State<Profile> {
     Uint8List im = await pickImage(ImageSource.gallery);
     setState(() {
       _image = im;
+    });
+  }
+
+  Future<void> updateProfile() async {
+    if (usernameController.text.isEmpty &&
+        emailController.text.isEmpty &&
+        _image == null) {
+      showSnackBar(context, 'No changes to update!');
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    await AuthServices().updateUser(
+      context: context,
+      profileImage: _image,
+      userName: usernameController.text.isNotEmpty
+          ? usernameController.text
+          : Provider.of<UserProvider>(context, listen: false).user.userName,
+      email: emailController.text.isNotEmpty
+          ? emailController.text
+          : Provider.of<UserProvider>(context, listen: false).user.email,
+    );
+
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -89,7 +118,7 @@ class _ProfileState extends State<Profile> {
               obscureText: false,
             ),
             MyButton(
-              onTap: () {},
+              onTap: updateProfile,
               content: isLoading
                   ? const CircularProgressIndicator()
                   : const Text(

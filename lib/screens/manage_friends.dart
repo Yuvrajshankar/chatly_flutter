@@ -10,34 +10,7 @@ class ManageFriends extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var friends = Provider.of<FriendProvider>(context).friendsList;
-    debugPrint("friendID: $friends");
-    // final friendsData = friends.map((friend) {
-    //   return {
-    //     'name': friend.userName,
-    //     'email': friend.email,
-    //     'image': friend.profileImage,
-    //   };
-    // }).toList();
-    // final List<Map<String, String>> friends = [
-    //   {
-    //     "name": "John Doe",
-    //     "subtitle": "Last online 5 min ago",
-    //     "image":
-    //         "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-    //   },
-    //   {
-    //     "name": "Jane Smith",
-    //     "subtitle": "Last online 2 hours ago",
-    //     "image":
-    //         "https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg",
-    //   },
-    //   {
-    //     "name": "Alice Johnson",
-    //     "subtitle": "Last online yesterday",
-    //     "image":
-    //         "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp",
-    //   },
-    // ];
+    // debugPrint("friendID: $friends");
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,

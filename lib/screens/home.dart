@@ -37,6 +37,7 @@ class _HomeState extends State<Home> {
     // Convert List<Friends> to List<Map<String, String>>
     final friendsData = friends.map((friend) {
       return {
+        'id': friend.id,
         'name': friend.userName,
         'email': friend.email,
         'image': friend.profileImage,
@@ -95,6 +96,7 @@ class _HomeState extends State<Home> {
                           builder: (context) => Chat(
                             name: friend['name']!,
                             image: friend['image']!,
+                            receiverId: friend['id']!,
                           ),
                         ),
                       );

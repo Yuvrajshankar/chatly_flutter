@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:chatly_flutter/services/auth_services.dart';
 import 'package:chatly_flutter/utils/utils.dart';
 import 'package:chatly_flutter/widgets/my_button.dart';
 import 'package:chatly_flutter/widgets/my_text_field.dart';
@@ -19,11 +20,42 @@ class _RegisterState extends State<Register> {
   final passwordController = TextEditingController();
   bool isLoading = false;
   Uint8List? _image;
+  final AuthServices authServices = AuthServices();
+
+  @override
+  void dispose() {
+    super.dispose();
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
 
   selectImage() async {
     Uint8List im = await pickImage(ImageSource.gallery);
     setState(() {
       _image = im;
+    });
+  }
+
+  void signupUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    if (_image != null) {
+      await authServices.registerUser(
+        context: context,
+        profileImage: _image!,
+        userName: usernameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+      );
+    } else {
+      showSnackBar(context, 'Please select a profile Image');
+    }
+
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -72,7 +104,7 @@ class _RegisterState extends State<Register> {
           obscureText: true,
         ),
         MyButton(
-          onTap: () {},
+          onTap: signupUser,
           content: isLoading
               ? const CircularProgressIndicator()
               : const Text(

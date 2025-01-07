@@ -1,14 +1,18 @@
 import 'package:chatly_flutter/components/chat_messages.dart';
+import 'package:chatly_flutter/services/message_services.dart';
+// import 'package:chatly_flutter/services/socket_service.dart';
 import 'package:flutter/material.dart';
 
 class Chat extends StatefulWidget {
   final String name;
   final String image;
+  final String receiverId;
 
   const Chat({
     super.key,
     required this.name,
     required this.image,
+    required this.receiverId,
   });
 
   @override
@@ -17,6 +21,32 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   final TextEditingController _messageController = TextEditingController();
+  bool isLoading = false;
+  final MessageServices messageServices = MessageServices();
+
+  void sendMessage() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    await messageServices.sendMessage(
+      receiverId: widget.receiverId,
+      message: _messageController.text,
+    );
+
+    // final message = {
+    //   "receiver": widget.receiverId,
+    //   "message": _messageController.text.trim(),
+    // };
+
+    // SocketService.sendMessage(message);
+
+    setState(() {
+      isLoading = false;
+      _messageController.clear();
+      // _messageController.text = '';
+    });
+  }
 
   @override
   void dispose() {
@@ -51,7 +81,9 @@ class _ChatState extends State<Chat> {
           Expanded(
             child: Container(
               color: Theme.of(context).colorScheme.background,
-              child: ChatMessages(),
+              child: ChatMessages(
+                receiverId: widget.receiverId,
+              ),
             ),
           ),
           Container(
@@ -80,20 +112,23 @@ class _ChatState extends State<Chat> {
                 ),
                 const SizedBox(width: 10),
                 // Send button
-                IconButton(
-                  icon: Icon(
-                    Icons.send,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
-                  onPressed: () {
-                    // Handle send message action
-                    String message = _messageController.text.trim();
-                    if (message.isNotEmpty) {
-                      debugPrint("Send message: $message");
-                      _messageController.clear();
-                    }
-                  },
-                ),
+                isLoading
+                    ? const CircularProgressIndicator()
+                    : IconButton(
+                        icon: Icon(
+                          Icons.send,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                        onPressed: () {
+                          // Handle send message action
+                          // String message = _messageController.text.trim();
+                          if (_messageController.text.isNotEmpty) {
+                            debugPrint(
+                                "Send message: ${_messageController.text}");
+                            sendMessage();
+                          }
+                        },
+                      ),
               ],
             ),
           ),

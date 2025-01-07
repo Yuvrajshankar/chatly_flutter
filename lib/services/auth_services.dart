@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:chatly_flutter/provider/user_provider.dart';
 import 'package:chatly_flutter/screens/auth.dart';
@@ -15,6 +16,64 @@ class AuthServices {
   final cloudinary = CloudinaryPublic('dkh984g6c', 'yuvraj', cache: false);
 
   // register
+  Future<void> registerUser({
+    required BuildContext context,
+    required Uint8List profileImage,
+    required String userName,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      // debugPrint("REGISTERING STARTING");
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      final navigator = Navigator.of(context);
+      // debugPrint(userProvider.toString());
+      CloudinaryResponse cloudinaryResponse = await cloudinary.uploadFile(
+        CloudinaryFile.fromBytesData(
+          profileImage,
+          identifier: 'profile_image_$userName',
+        ),
+      );
+
+      String profileImageUrl = cloudinaryResponse.secureUrl;
+      // debugPrint("profileImageUrl: $profileImageUrl");
+      // debugPrint("userName: $userName");
+      // debugPrint("email: $email");
+      // debugPrint("password: $password");
+
+      http.Response res = await http.post(
+        Uri.parse('${Constants.uri}/auth/register'),
+        body: jsonEncode({
+          'profileImage': profileImageUrl,
+          'userName': userName,
+          'email': email,
+          'password': password,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      // debugPrint("res: ${res.body}");
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          userProvider.setUser(res.body);
+          await prefs.setString('x-auth-token', jsonDecode(res.body)['token']);
+          navigator.pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const Home(),
+            ),
+            (route) => false,
+          );
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
 
   // login
   Future<void> logInUser({
@@ -109,6 +168,73 @@ class AuthServices {
   }
 
   // update
+  Future<void> updateUser({
+    required BuildContext context,
+    required Uint8List? profileImage,
+    required String userName,
+    required String email,
+  }) async {
+    try {
+      // debugPrint("UPDATE USER STARTED");
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      String? profileImageUrl;
+      // debugPrint("profileImageUrl: $profileImageUrl");
+
+      // Upload new profile image if provided
+      if (profileImage != null) {
+        CloudinaryResponse cloudinaryResponse = await cloudinary.uploadFile(
+          CloudinaryFile.fromBytesData(
+            profileImage,
+            identifier: 'profile_image_$userName',
+          ),
+        );
+        profileImageUrl = cloudinaryResponse.secureUrl;
+        // debugPrint("profileImageUrl12: $profileImageUrl");
+      }
+
+      // Prepare the request payload
+      Map<String, dynamic> updateData = {
+        'userName': userName,
+        'email': email,
+      };
+
+      if (profileImageUrl != null) {
+        updateData['profileImage'] = profileImageUrl;
+      }
+
+      // Make the HTTP request
+      http.Response res = await http.patch(
+        Uri.parse('${Constants.uri}/auth/update'),
+        body: jsonEncode(updateData),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': userProvider.user.token,
+        },
+      );
+
+      // debugPrint("res: ${res.body}");
+
+      // Handle the response
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          final responseData = jsonDecode(res.body);
+          responseData['user']['token'] = userProvider.user.token;
+          userProvider.setUser(jsonEncode(responseData['user']));
+          // userProvider.setUser(res.body);
+          // debugPrint("email: ${userProvider.user.email}");
+          // debugPrint("userName: ${userProvider.user.userName}");
+          // debugPrint("profileImage: ${userProvider.user.profileImage}");
+          // debugPrint("token: ${userProvider.user.token}");
+          // debugPrint("password: ${userProvider.user.toString()}");
+          showSnackBar(context, 'Profile updated successfully!');
+        },
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
 
   // logout
   void signOut(BuildContext context) async {
