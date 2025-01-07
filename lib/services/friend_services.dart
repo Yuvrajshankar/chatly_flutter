@@ -67,16 +67,16 @@ class FriendServices {
     String friendId,
   ) async {
     try {
-      debugPrint("add-remove function STARTING");
+      // debugPrint("add-remove function STARTING");
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('x-auth-token');
-      debugPrint("token: $token");
+      // debugPrint("token: $token");
 
       if (token == null) {
         throw Exception("Token not found. Please log in again.");
       }
 
-      debugPrint("friendId: $friendId");
+      // debugPrint("friendId: $friendId");
 
       // Make HTTP PATCH request
       final response = await http.patch(
@@ -87,7 +87,7 @@ class FriendServices {
         },
       );
 
-      debugPrint("response: ${response.body}");
+      // debugPrint("response: ${response.body}");
 
       // response checking
       if (response.statusCode == 200) {
@@ -115,5 +115,41 @@ class FriendServices {
         e.toString(),
       );
     }
+  }
+
+  // SEARCH FRIEND
+  Future<List<Friends>> searchFriends(
+      BuildContext context, String userName) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('x-auth-token');
+
+      if (token == null) {
+        throw Exception("Token not found. Please log in again.");
+      }
+
+      final response = await http.get(
+        Uri.parse('${Constants.uri}/auth/search?userName=$userName'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data is List) {
+          return data.map((item) => Friends.fromMap(item)).toList();
+        } else if (data is Map<String, dynamic>) {
+          return [Friends.fromMap(data)];
+        }
+      } else {
+        // showSnackBar(context, 'Failed to search friend: ${response.body}');
+        debugPrint('Failed to search friend: ${response.body}');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return [];
   }
 }
